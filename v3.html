@@ -476,7 +476,7 @@
     let tempIngredients = [];
     let editingIndex = -1;
 
-    // ===== FOOD DATABASE =====
+    // ===== FOOD DATABASE (per 100g) =====
     const foodDB = {
       'chicken breast': { cal: 165, protein: 31, carbs: 0, fat: 3.6 },
       'chicken': { cal: 165, protein: 31, carbs: 0, fat: 3.6 },
@@ -546,6 +546,12 @@
       'paprika': { cal: 282, protein: 14, carbs: 54, fat: 13 },
       'chili': { cal: 282, protein: 12, carbs: 56, fat: 14 },
       'cinnamon': { cal: 247, protein: 4, carbs: 80, fat: 1.2 },
+    };
+
+    // Special items with different base units
+    const specialItems = {
+      'egg': { perUnit: 50, cal: 77, protein: 6.5, carbs: 0.5, fat: 5.5 },
+      'eggs': { perUnit: 50, cal: 77, protein: 6.5, carbs: 0.5, fat: 5.5 },
     };
 
     // ===== DOM REFS =====
@@ -643,6 +649,34 @@
       activateTab('add');
     }
 
+    // ===== PARSE QUANTITY FROM INGREDIENT STRING =====
+    function parseQuantity(ingredient) {
+      // Look for patterns like "2 eggs", "200g chicken", "1 cup flour"
+      const patterns = [
+        /^(\d+)\s*(g|kg|ml|l|oz|lb)?\s+(.+)/i,  // "200g chicken"
+        /^(\d+)\s+(.+)/,                         // "2 eggs"
+        /^(\d+\.\d+)\s+(.+)/,                    // "1.5 cups"
+      ];
+      
+      for (const pattern of patterns) {
+        const match = ingredient.match(pattern);
+        if (match) {
+          const qty = parseFloat(match[1]);
+          const unit = match[2] || '';
+          const name = match[3] || match[2] || '';
+          return { quantity: qty, unit: unit.toLowerCase(), name: name.trim() || ingredient };
+        }
+      }
+      
+      // If no quantity found, check if it's a count (like "2 eggs" but with no space)
+      const countMatch = ingredient.match(/^(\d+)(.+)/);
+      if (countMatch) {
+        return { quantity: parseFloat(countMatch[1]), unit: 'count', name: countMatch[2].trim() };
+      }
+      
+      return { quantity: 100, unit: 'g', name: ingredient }; // default to 100g
+    }
+
     // ===== AUTO-CALCULATE MACROS =====
     function autoCalculateMacros() {
       const ingredients = tempIngredients;
@@ -657,36 +691,73 @@
       setTimeout(() => {
         let totalCal = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
         let matchedCount = 0;
+        let unknownIngredients = [];
 
         ingredients.forEach(ing => {
-          const ingLower = ing.toLowerCase();
+          const parsed = parseQuantity(ing);
+          const ingLower = parsed.name.toLowerCase();
           let found = false;
           
-          for (const [key, value] of Object.entries(foodDB)) {
-            if (ingLower.includes(key) || key.includes(ingLower)) {
-              let quantity = 100;
-              const match = ing.match(/(\d+)\s*(g|kg|ml|l|oz|lb)?/i);
-              if (match) {
-                let qty = parseFloat(match[1]);
-                const unit = match[2] ? match[2].toLowerCase() : 'g';
-                if (unit === 'kg' || unit === 'l') qty = qty * 1000;
-                else if (unit === 'oz') qty = qty * 28.35;
-                else if (unit === 'lb') qty = qty * 453.6;
-                quantity = qty;
+          // Check special items first (like eggs)
+          if (specialItems[ingLower] || specialItems[ingLower.replace(/s$/, '')]) {
+            const key = ingLower.replace(/s$/, '');
+            const item = specialItems[key];
+            const qty = parsed.quantity;
+            // For count items, each unit has the macros
+            const factor = qty;
+            totalCal += item.cal * factor;
+            totalProtein += item.protein * factor;
+            totalCarbs += item.carbs * factor;
+            totalFat += item.fat * factor;
+            found = true;
+            matchedCount++;
+          } else {
+            // Search in food database
+            for (const [key, value] of Object.entries(foodDB)) {
+              if (ingLower.includes(key) || key.includes(ingLower)) {
+                // Determine quantity
+                let quantity = parsed.quantity;
+                let unit = parsed.unit;
+                
+                // If unit is g or empty, use as is
+                if (unit === 'kg') quantity = quantity * 1000;
+                else if (unit === 'ml' || unit === 'l') {
+                  // Assume density of 1g/ml for simplicity
+                  if (unit === 'l') quantity = quantity * 1000;
+                  // For liquids, we'll use the same as grams
+                } else if (unit === 'oz') quantity = quantity * 28.35;
+                else if (unit === 'lb') quantity = quantity * 453.6;
+                else if (unit === 'count' || unit === '') {
+                  // If it's a count, try to estimate weight
+                  if (ingLower.includes('egg')) {
+                    quantity = quantity * 50; // 50g per egg
+                  } else if (ingLower.includes('tomato')) {
+                    quantity = quantity * 150; // 150g per tomato
+                  } else if (ingLower.includes('onion')) {
+                    quantity = quantity * 150; // 150g per onion
+                  } else if (ingLower.includes('garlic')) {
+                    quantity = quantity * 5; // 5g per clove
+                  } else {
+                    // Default to 100g if no unit specified
+                    quantity = 100;
+                  }
+                }
+                
+                const factor = quantity / 100;
+                totalCal += value.cal * factor;
+                totalProtein += value.protein * factor;
+                totalCarbs += value.carbs * factor;
+                totalFat += value.fat * factor;
+                found = true;
+                matchedCount++;
+                break;
               }
-              
-              const factor = quantity / 100;
-              totalCal += value.cal * factor;
-              totalProtein += value.protein * factor;
-              totalCarbs += value.carbs * factor;
-              totalFat += value.fat * factor;
-              found = true;
-              matchedCount++;
-              break;
             }
           }
           
           if (!found) {
+            unknownIngredients.push(ing);
+            // Try to guess from common patterns
             if (ingLower.includes('oil') || ingLower.includes('butter')) {
               totalCal += 800;
               totalFat += 90;
@@ -697,7 +768,11 @@
             } else if (ingLower.includes('flour') || ingLower.includes('sugar') || ingLower.includes('rice') || ingLower.includes('pasta')) {
               totalCal += 130;
               totalCarbs += 25;
+            } else if (ingLower.includes('vegetable') || ingLower.includes('fruit')) {
+              totalCal += 50;
+              totalCarbs += 10;
             } else {
+              // Generic estimate
               totalCal += 50;
               totalCarbs += 5;
               totalProtein += 1;
@@ -705,11 +780,15 @@
           }
         });
 
+        // Show results
         if (matchedCount === 0 && ingredients.length > 0) {
           autoProgress.textContent = '⚠️ No ingredients recognized. Manual entry recommended.';
           setTimeout(() => { autoProgress.textContent = ''; }, 3000);
+        } else if (unknownIngredients.length > 0) {
+          autoProgress.textContent = `⚠️ ${unknownIngredients.length} ingredient(s) not recognized. Manual adjustment recommended.`;
+          setTimeout(() => { autoProgress.textContent = ''; }, 4000);
         } else {
-          autoProgress.textContent = `✅ Matched ${matchedCount}/${ingredients.length} ingredients`;
+          autoProgress.textContent = `✅ Calculated from ${matchedCount} ingredient(s)`;
           setTimeout(() => { autoProgress.textContent = ''; }, 2000);
         }
 
@@ -719,7 +798,7 @@
         macroFat.value = Math.round(totalFat * 10) / 10;
 
         if (totalCal === 0 && totalProtein === 0 && totalCarbs === 0 && totalFat === 0) {
-          autoProgress.textContent = '⚠️ Could not detect ingredients. Try more specific names.';
+          autoProgress.textContent = '⚠️ Could not calculate macros. Try more specific ingredient names.';
           setTimeout(() => { autoProgress.textContent = ''; }, 3000);
         }
       }, 100);
