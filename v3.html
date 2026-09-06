@@ -1764,3 +1764,71 @@
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Shared Cookbook</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; }
+        input, button { padding: 10px; font-size: 16px; }
+        ul { list-style-type: none; padding: 0; }
+        li { padding: 8px; margin: 5px 0; background: #f0f0f0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <h1>🍳 Our Shared Cookbook</h1>
+    
+    <!-- Input to add a new recipe -->
+    <input type="text" id="recipeInput" placeholder="Enter recipe name...">
+    <button onclick="saveRecipe()">Add Recipe</button>
+
+    <h2>Recipes (Auto-Syncing)</h2>
+    <ul id="recipeList"></ul>
+
+    <!-- Firebase Modular SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        // Your Firebase Configuration (auto-connected to your project)
+        const firebaseConfig = {
+            databaseURL: "https://cookbook-bc019-default-rtdb.firebaseio.com",
+            projectId: "cookbook-bc019"
+        };
+
+        // Initialize Firebase and Database
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const recipesRef = ref(db, 'recipes');
+
+        // 1. LISTEN: Auto-sync recipe list whenever you or your boyfriend make a change [5]
+        onValue(recipesRef, (snapshot) => {
+            const listElement = document.getElementById('recipeList');
+            listElement.innerHTML = ''; // Clear current list
+            
+            const recipes = snapshot.val();
+            if (recipes) {
+                Object.values(recipes).forEach(recipe => {
+                    const li = document.createElement('li');
+                    li.textContent = recipe.name;
+                    listElement.appendChild(li);
+                });
+            }
+        });
+
+        // 2. WRITE: Save a new recipe to the database
+        window.saveRecipe = function() {
+            const input = document.getElementById('recipeInput');
+            const recipeName = input.value.trim();
+            
+            if (recipeName) {
+                push(recipesRef, { name: recipeName });
+                input.value = ''; // Clear input field
+            }
+        };
+    </script>
+</body>
+</html>
