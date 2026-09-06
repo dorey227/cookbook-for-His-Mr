@@ -344,14 +344,6 @@
       border-color: #3e2e1f;
       background: #f5efe8;
     }
-    .edit-badge {
-      background: #3e2e1f;
-      color: white;
-      padding: 2px 12px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 500;
-    }
     .inline-actions {
       display: flex;
       gap: 6px;
@@ -484,7 +476,7 @@
     let tempIngredients = [];
     let editingIndex = -1;
 
-    // ===== FOOD DATABASE (common ingredients with macros per 100g) =====
+    // ===== FOOD DATABASE =====
     const foodDB = {
       'chicken breast': { cal: 165, protein: 31, carbs: 0, fat: 3.6 },
       'chicken': { cal: 165, protein: 31, carbs: 0, fat: 3.6 },
@@ -527,7 +519,7 @@
       'spinach': { cal: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
       'kale': { cal: 49, protein: 4.3, carbs: 9, fat: 0.9 },
       'carrot': { cal: 41, protein: 0.9, carbs: 10, fat: 0.2 },
-      'pepper bell': { cal: 26, protein: 1, carbs: 6, fat: 0.3 },
+      'bell pepper': { cal: 26, protein: 1, carbs: 6, fat: 0.3 },
       'mushroom': { cal: 22, protein: 3.1, carbs: 3.3, fat: 0.3 },
       'avocado': { cal: 160, protein: 2, carbs: 9, fat: 15 },
       'beans': { cal: 132, protein: 8.7, carbs: 23, fat: 0.5 },
@@ -620,11 +612,9 @@
       recipeName.value = recipe.name || '';
       instructionsInput.value = recipe.instructions || '';
       
-      // Load ingredients
       tempIngredients = recipe.ingredients ? [...recipe.ingredients] : [];
       renderIngredientChips();
       
-      // Load photo
       if (recipe.image && recipe.image.startsWith('data:image')) {
         photoPreview.src = recipe.image;
         photoPreview.classList.add('show');
@@ -637,7 +627,6 @@
         photoUploadText.textContent = 'Tap to add or change photo';
       }
       
-      // Load macros
       if (recipe.macros) {
         macroCal.value = recipe.macros.cal || '';
         macroProtein.value = recipe.macros.protein || '';
@@ -665,7 +654,6 @@
 
       autoProgress.textContent = '🔍 Analyzing ingredients...';
       
-      // Use setTimeout to let UI update
       setTimeout(() => {
         let totalCal = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
         let matchedCount = 0;
@@ -674,11 +662,9 @@
           const ingLower = ing.toLowerCase();
           let found = false;
           
-          // Try to find ingredient in database (partial match)
           for (const [key, value] of Object.entries(foodDB)) {
             if (ingLower.includes(key) || key.includes(ingLower)) {
-              // Try to extract quantity (e.g., "200g" -> 200)
-              let quantity = 100; // default to 100g
+              let quantity = 100;
               const match = ing.match(/(\d+)\s*(g|kg|ml|l|oz|lb)?/i);
               if (match) {
                 let qty = parseFloat(match[1]);
@@ -700,32 +686,25 @@
             }
           }
           
-          // If ingredient not found in DB, try to parse it
           if (!found) {
-            // Check if it's a common unit like "cup", "tbsp", etc.
-            const match = ing.match(/(\d+)\s*(cup|tbsp|tsp|oz|lb|g|ml)/i);
-            if (match) {
-              // Add a generic estimate based on type
-              if (ingLower.includes('flour') || ingLower.includes('sugar') || ingLower.includes('rice') || ingLower.includes('pasta')) {
-                totalCal += 130; // generic carb estimate per 100g
-                totalCarbs += 25;
-              } else if (ingLower.includes('oil') || ingLower.includes('butter')) {
-                totalCal += 800;
-                totalFat += 90;
-              } else if (ingLower.includes('meat') || ingLower.includes('chicken') || ingLower.includes('beef') || ingLower.includes('pork')) {
-                totalCal += 200;
-                totalProtein += 25;
-                totalFat += 10;
-              } else {
-                totalCal += 50; // generic vegetable/fruit
-                totalCarbs += 5;
-                totalProtein += 1;
-              }
+            if (ingLower.includes('oil') || ingLower.includes('butter')) {
+              totalCal += 800;
+              totalFat += 90;
+            } else if (ingLower.includes('meat') || ingLower.includes('chicken') || ingLower.includes('beef') || ingLower.includes('pork')) {
+              totalCal += 200;
+              totalProtein += 25;
+              totalFat += 10;
+            } else if (ingLower.includes('flour') || ingLower.includes('sugar') || ingLower.includes('rice') || ingLower.includes('pasta')) {
+              totalCal += 130;
+              totalCarbs += 25;
+            } else {
+              totalCal += 50;
+              totalCarbs += 5;
+              totalProtein += 1;
             }
           }
         });
 
-        // If no ingredients matched, show warning
         if (matchedCount === 0 && ingredients.length > 0) {
           autoProgress.textContent = '⚠️ No ingredients recognized. Manual entry recommended.';
           setTimeout(() => { autoProgress.textContent = ''; }, 3000);
@@ -734,13 +713,11 @@
           setTimeout(() => { autoProgress.textContent = ''; }, 2000);
         }
 
-        // Round to 1 decimal
         macroCal.value = Math.round(totalCal);
         macroProtein.value = Math.round(totalProtein * 10) / 10;
         macroCarbs.value = Math.round(totalCarbs * 10) / 10;
         macroFat.value = Math.round(totalFat * 10) / 10;
 
-        // If all zeros, show message
         if (totalCal === 0 && totalProtein === 0 && totalCarbs === 0 && totalFat === 0) {
           autoProgress.textContent = '⚠️ Could not detect ingredients. Try more specific names.';
           setTimeout(() => { autoProgress.textContent = ''; }, 3000);
@@ -769,7 +746,6 @@
           ? `<ul class="ingredient-list">${r.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>`
           : '<div style="color:#8f7a66; font-size:0.9rem;">No ingredients</div>';
         
-        // Macros display
         let macrosHtml = '';
         if (r.macros && (r.macros.cal || r.macros.protein || r.macros.carbs || r.macros.fat)) {
           macrosHtml = `
@@ -782,4 +758,298 @@
           `;
         }
         
-        html
+        html += `
+          <div class="recipe-card" data-index="${idx}">
+            <div class="recipe-header">
+              <div>
+                <div class="recipe-title">${r.name}</div>
+              </div>
+              <div class="inline-actions">
+                <button class="btn btn-outline edit-recipe-btn" data-index="${idx}">✏️ Edit</button>
+                <button class="btn btn-outline add-to-shopping-btn" data-index="${idx}">🛒 + list</button>
+                <button class="btn btn-danger delete-recipe-btn" data-index="${idx}">✕</button>
+              </div>
+            </div>
+            ${imgHtml}
+            ${ingredientsHtml}
+            ${macrosHtml}
+            ${r.instructions ? `<div style="margin-top:8px; color:#3e2e1f; white-space:pre-wrap; font-size:0.95rem;">${r.instructions}</div>` : ''}
+            <div class="actions">
+              <span style="font-size:0.8rem; color:#8f7a66;">${r.ingredients ? r.ingredients.length : 0} ingredients</span>
+              <span class="edit-hint" style="font-size:0.75rem; color:#8f7a66;">👆 Tap card to edit</span>
+            </div>
+          </div>
+        `;
+      });
+      recipeListEl.innerHTML = html;
+
+      document.querySelectorAll('.recipe-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('button')) return;
+          const idx = parseInt(card.dataset.index);
+          loadRecipeForEdit(idx);
+        });
+      });
+
+      document.querySelectorAll('.edit-recipe-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = parseInt(btn.dataset.index);
+          loadRecipeForEdit(idx);
+        });
+      });
+
+      document.querySelectorAll('.delete-recipe-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = parseInt(btn.dataset.index);
+          if (confirm(`Delete "${recipes[idx].name}"?`)) {
+            recipes.splice(idx, 1);
+            saveRecipes();
+            renderRecipes();
+            renderShopping();
+          }
+        });
+      });
+
+      document.querySelectorAll('.add-to-shopping-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = parseInt(btn.dataset.index);
+          const recipe = recipes[idx];
+          if (recipe && recipe.ingredients) {
+            recipe.ingredients.forEach(ing => {
+              shoppingItems.push({ name: ing, checked: false, source: recipe.name });
+            });
+            saveShopping();
+            renderShopping();
+          }
+        });
+      });
+    }
+
+    // ===== RENDER SHOPPING =====
+    function renderShopping() {
+      if (!shoppingItems.length) {
+        shoppingContainer.innerHTML = `<div class="empty-state">🛒 Your shopping list is empty.</div>`;
+        return;
+      }
+      let html = '';
+      shoppingItems.forEach((item, idx) => {
+        const checked = item.checked ? 'checked' : '';
+        html += `
+          <div class="shopping-item" data-index="${idx}">
+            <input type="checkbox" ${checked} class="shopping-checkbox">
+            <span class="item-name">${item.name}</span>
+            <span class="item-source">${item.source ? '📖 ' + item.source : ''}</span>
+            <button class="btn btn-danger" style="padding:2px 12px; font-size:0.8rem;" data-shopping-index="${idx}">✕</button>
+          </div>
+        `;
+      });
+      shoppingContainer.innerHTML = html;
+
+      document.querySelectorAll('.shopping-checkbox').forEach((cb, idx) => {
+        cb.addEventListener('change', (e) => {
+          shoppingItems[idx].checked = cb.checked;
+          saveShopping();
+        });
+      });
+
+      document.querySelectorAll('[data-shopping-index]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(btn.dataset.shoppingIndex);
+          shoppingItems.splice(idx, 1);
+          saveShopping();
+          renderShopping();
+        });
+      });
+    }
+
+    // ===== PHOTO UPLOAD =====
+    photoUploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          photoPreview.src = ev.target.result;
+          photoPreview.classList.add('show');
+          photoUploadArea.classList.add('has-image');
+          photoUploadText.textContent = 'Change photo';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // ===== INGREDIENTS =====
+    function renderIngredientChips() {
+      ingredientChips.innerHTML = tempIngredients.map((ing, i) => 
+        `<span class="chip">${ing} <span class="remove" data-ing-index="${i}">✕</span></span>`
+      ).join('');
+      document.querySelectorAll('.chip .remove').forEach(el => {
+        el.addEventListener('click', (e) => {
+          const idx = parseInt(el.dataset.ingIndex);
+          tempIngredients.splice(idx, 1);
+          renderIngredientChips();
+        });
+      });
+    }
+
+    addIngredientBtn.addEventListener('click', () => {
+      const val = ingredientInput.value.trim();
+      if (val) {
+        tempIngredients.push(val);
+        ingredientInput.value = '';
+        renderIngredientChips();
+      }
+    });
+    ingredientInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addIngredientBtn.click();
+      }
+    });
+
+    // ===== SAVE RECIPE =====
+    saveRecipeBtn.addEventListener('click', () => {
+      const name = recipeName.value.trim();
+      if (!name) { alert('Please enter a recipe name.'); return; }
+      if (!tempIngredients.length) { alert('Add at least one ingredient.'); return; }
+
+      const recipeData = {
+        name: name,
+        ingredients: [...tempIngredients],
+        instructions: instructionsInput.value.trim(),
+        image: photoPreview.src && photoPreview.classList.contains('show') ? photoPreview.src : '',
+        macros: {
+          cal: parseFloat(macroCal.value) || 0,
+          protein: parseFloat(macroProtein.value) || 0,
+          carbs: parseFloat(macroCarbs.value) || 0,
+          fat: parseFloat(macroFat.value) || 0
+        }
+      };
+
+      const editIdx = parseInt(editIndexInput.value);
+      if (editIdx >= 0 && editIdx < recipes.length) {
+        recipes[editIdx] = recipeData;
+      } else {
+        recipes.push(recipeData);
+      }
+      
+      saveRecipes();
+      resetForm();
+      activateTab('recipes');
+      renderRecipes();
+    });
+
+    // ===== CANCEL EDIT =====
+    cancelEditBtn.addEventListener('click', () => {
+      if (editingIndex >= 0) {
+        if (confirm('Cancel editing? Changes will be lost.')) {
+          resetForm();
+          activateTab('recipes');
+        }
+      } else {
+        resetForm();
+        activateTab('recipes');
+      }
+    });
+
+    // ===== EXPORT/IMPORT =====
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const data = {
+        recipes: recipes,
+        shopping: shoppingItems,
+        exportedAt: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cookbook_backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('importBtn').addEventListener('click', () => {
+      document.getElementById('importFileInput').click();
+    });
+
+    document.getElementById('importFileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (data.recipes && Array.isArray(data.recipes)) {
+            if (confirm(`Import ${data.recipes.length} recipes and ${data.shopping?.length || 0} shopping items? (Current data will be replaced)`)) {
+              recipes = data.recipes;
+              shoppingItems = data.shopping || [];
+              saveRecipes();
+              saveShopping();
+              renderRecipes();
+              renderShopping();
+              alert('✅ Import successful!');
+            }
+          } else {
+            alert('❌ Invalid file format.');
+          }
+        } catch (err) {
+          alert('❌ Error reading file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    // ===== SHOPPING ACTIONS =====
+    document.getElementById('clearShoppingBtn').addEventListener('click', () => {
+      shoppingItems = shoppingItems.filter(item => !item.checked);
+      saveShopping();
+      renderShopping();
+    });
+
+    document.getElementById('addCustomShoppingBtn').addEventListener('click', () => {
+      const itemName = prompt('Enter item name:');
+      if (itemName && itemName.trim()) {
+        shoppingItems.push({ name: itemName.trim(), checked: false, source: 'manual' });
+        saveShopping();
+        renderShopping();
+      }
+    });
+
+    // ===== TABS =====
+    function activateTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+      document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        activateTab(tab);
+        if (tab === 'recipes') {
+          renderRecipes();
+          if (editingIndex >= 0) resetForm();
+        }
+        if (tab === 'shopping') renderShopping();
+        if (tab === 'add') {
+          if (editingIndex < 0) resetForm();
+        }
+      });
+    });
+
+    // ===== INIT =====
+    renderRecipes();
+    renderShopping();
+    renderIngredientChips();
+  })();
+</script>
+</body>
+</html>
