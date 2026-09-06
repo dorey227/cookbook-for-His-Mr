@@ -918,9 +918,10 @@
     function applySettings() {
       const root = document.documentElement;
       const accent = settings.accentColor;
+      const isDark = settings.theme === 'dark';
       
       // App background
-      if (settings.theme === 'dark') {
+      if (isDark) {
         document.body.style.background = '#0d0d0d';
         app.style.background = '#1a1a1a';
         app.style.border = '1px solid #2a2a2a';
@@ -932,23 +933,58 @@
         app.style.color = '#222';
       }
 
-      // Accent color
+      // Accent color - PRIMARY buttons (text should be dark or white depending on theme)
       document.querySelectorAll('.btn-primary').forEach(el => {
         el.style.background = accent;
-        el.style.color = settings.theme === 'dark' ? '#0d0d0d' : '#fff';
+        el.style.color = isDark ? '#0d0d0d' : '#ffffff';
         el.style.boxShadow = `0 4px 12px ${accent}44`;
       });
+      
+      // Active tabs
       document.querySelectorAll('.tab-btn.active').forEach(el => {
         el.style.background = accent;
-        el.style.color = settings.theme === 'dark' ? '#0d0d0d' : '#fff';
+        el.style.color = isDark ? '#0d0d0d' : '#ffffff';
         el.style.boxShadow = `0 4px 16px ${accent}44`;
       });
+      
+      // Macro values
       document.querySelectorAll('.macro-value').forEach(el => {
         el.style.color = accent;
       });
+      
+      // Color options active state
       document.querySelectorAll('.color-option.active').forEach(el => {
-        el.style.borderColor = settings.theme === 'dark' ? '#fff' : '#333';
+        el.style.borderColor = isDark ? '#fff' : '#333';
         el.style.boxShadow = `0 0 0 2px ${accent}66`;
+      });
+      
+      // ===== FIX: OUTLINE BUTTONS (Edit, + list, etc.) =====
+      // These need LIGHT text on dark backgrounds
+      document.querySelectorAll('.btn-outline').forEach(el => {
+        el.style.color = isDark ? '#e0e0e0' : '#333';
+        el.style.borderColor = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.2)';
+        el.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)';
+      });
+      
+      // Danger buttons
+      document.querySelectorAll('.btn-danger').forEach(el => {
+        el.style.color = isDark ? '#ff6b6b' : '#c0392b';
+        el.style.borderColor = isDark ? 'rgba(255,100,100,0.3)' : 'rgba(192,57,43,0.3)';
+        el.style.background = isDark ? 'rgba(255,100,100,0.1)' : 'rgba(192,57,43,0.08)';
+      });
+      
+      // Auto buttons
+      document.querySelectorAll('.btn-auto').forEach(el => {
+        el.style.color = isDark ? '#8ab4f5' : '#2a5a8a';
+        el.style.borderColor = isDark ? 'rgba(100,150,255,0.3)' : 'rgba(42,90,138,0.3)';
+        el.style.background = isDark ? 'rgba(100,150,255,0.1)' : 'rgba(42,90,138,0.08)';
+      });
+      
+      // Success buttons
+      document.querySelectorAll('.btn-success').forEach(el => {
+        el.style.color = isDark ? '#6ad48a' : '#1a6a3a';
+        el.style.borderColor = isDark ? 'rgba(100,200,130,0.3)' : 'rgba(26,106,58,0.3)';
+        el.style.background = isDark ? 'rgba(100,200,130,0.1)' : 'rgba(26,106,58,0.08)';
       });
       
       // Font
@@ -971,24 +1007,89 @@
       app.style.fontSize = fontSize;
       
       // Header border color
-      document.querySelector('.header').style.borderBottomColor = settings.theme === 'dark' ? '#2a2a2a' : '#e0d6cc';
+      document.querySelector('.header').style.borderBottomColor = isDark ? '#2a2a2a' : '#e0d6cc';
       
       // Settings panel colors
       const panel = document.getElementById('settingsPanel');
-      panel.style.background = settings.theme === 'dark' ? '#1f1f1f' : '#ffffff';
-      panel.style.color = settings.theme === 'dark' ? '#eee' : '#222';
-      panel.style.border = settings.theme === 'dark' ? '1px solid #2a2a2a' : '1px solid #e0d6cc';
+      panel.style.background = isDark ? '#1f1f1f' : '#ffffff';
+      panel.style.color = isDark ? '#eee' : '#222';
+      panel.style.border = isDark ? '1px solid #2a2a2a' : '1px solid #e0d6cc';
       
       document.querySelectorAll('.settings-group input[type="text"], .settings-group input[type="color"]').forEach(el => {
-        el.style.borderColor = settings.theme === 'dark' ? '#333' : '#ccc';
-        el.style.background = settings.theme === 'dark' ? '#1a1a1a' : '#f5f0eb';
-        el.style.color = settings.theme === 'dark' ? '#eee' : '#222';
+        el.style.borderColor = isDark ? '#333' : '#ccc';
+        el.style.background = isDark ? '#1a1a1a' : '#f5f0eb';
+        el.style.color = isDark ? '#eee' : '#222';
       });
       
-      // Update range slider colors
+      // Range slider accent
       document.querySelectorAll('input[type="range"]').forEach(el => {
         el.style.accentColor = accent;
       });
+      
+      // Icon button
+      document.querySelectorAll('.icon-btn').forEach(el => {
+        el.style.color = isDark ? '#ccc' : '#555';
+      });
+      
+      // Recipe title
+      document.querySelectorAll('.recipe-title').forEach(el => {
+        el.style.color = isDark ? '#eee' : '#222';
+      });
+      
+      // Recipe card border
+      document.querySelectorAll('.recipe-card').forEach(el => {
+        el.style.borderColor = isDark ? '#2a2a2a' : '#e0d6cc';
+        el.style.background = isDark ? '#222' : '#faf8f5';
+      });
+      
+      // Ingredients
+      document.querySelectorAll('.ingredient-list li').forEach(el => {
+        el.style.background = isDark ? '#2a2a2a' : '#f0ebe4';
+        el.style.color = isDark ? '#bbb' : '#444';
+        el.style.borderColor = isDark ? '#333' : '#ddd';
+      });
+      
+      // Macros display
+      document.querySelectorAll('.macros-display').forEach(el => {
+        el.style.background = isDark ? '#1a1a1a' : '#f5f0eb';
+        el.style.borderColor = isDark ? '#2a2a2a' : '#ddd';
+      });
+      
+      // Chips
+      document.querySelectorAll('.chip').forEach(el => {
+        el.style.background = isDark ? '#2a2a2a' : '#f0ebe4';
+        el.style.color = isDark ? '#ccc' : '#444';
+        el.style.borderColor = isDark ? '#333' : '#ddd';
+      });
+      
+      // Form controls
+      document.querySelectorAll('.form-control').forEach(el => {
+        el.style.background = isDark ? '#1a1a1a' : '#faf8f5';
+        el.style.color = isDark ? '#eee' : '#222';
+        el.style.borderColor = isDark ? '#333' : '#d5d0ca';
+      });
+      
+      // Shopping items
+      document.querySelectorAll('.shopping-item').forEach(el => {
+        el.style.borderBottomColor = isDark ? '#2a2a2a' : '#e8e0d8';
+        el.style.color = isDark ? '#ddd' : '#333';
+      });
+      
+      // Empty state
+      document.querySelectorAll('.empty-state').forEach(el => {
+        el.style.color = isDark ? '#555' : '#999';
+      });
+      
+      // Settings close button
+      document.querySelectorAll('.settings-panel .close-btn').forEach(el => {
+        el.style.color = isDark ? '#ccc' : '#555';
+      });
+      
+      // Update the "small" text in header
+      document.querySelector('h1 small').textContent = isDark ? 'dark mode' : 'light mode';
+      
+      // Header h1 color
+      document.querySelector('.header h1').style.color = isDark ? '#eee' : '#222';
     }
 
     // ===== SETTINGS UI EVENTS =====
@@ -1022,7 +1123,6 @@
         settings.accentColor = color;
         saveSettings();
         applySettings();
-        // Highlight the custom color
         document.querySelectorAll('.color-option').forEach(b => {
           if (b.style.background === color) b.classList.add('active');
         });
@@ -1047,13 +1147,11 @@
       settings.theme = 'dark';
       saveSettings();
       applySettings();
-      document.querySelector('h1 small').textContent = 'dark mode';
     });
     themeLight.addEventListener('click', () => {
       settings.theme = 'light';
       saveSettings();
       applySettings();
-      document.querySelector('h1 small').textContent = 'light mode';
     });
 
     // Radius slider
@@ -1085,7 +1183,6 @@
           fontSize: 100
         };
         saveSettings();
-        // Reset UI
         document.querySelectorAll('.color-option').forEach(b => b.classList.remove('active'));
         document.querySelector('.color-option[style*="#f5a623"]')?.classList.add('active');
         document.querySelectorAll('.font-option').forEach(b => b.classList.remove('active'));
@@ -1097,14 +1194,12 @@
         customColorPicker.value = '#f5a623';
         customColorHex.value = '#f5a623';
         applySettings();
-        document.querySelector('h1 small').textContent = 'dark mode';
       }
     });
 
     // Open/close settings
     settingsToggle.addEventListener('click', () => {
       settingsOverlay.classList.add('open');
-      // Update UI to reflect current settings
       customColorPicker.value = settings.accentColor;
       customColorHex.value = settings.accentColor;
       radiusSlider.value = settings.cardRadius;
@@ -1320,6 +1415,7 @@
     function renderRecipes() {
       if (!recipes.length) {
         recipeListEl.innerHTML = `<div class="empty-state">🍽️ No recipes yet. Add your first!</div>`;
+        applySettings();
         return;
       }
       let html = '';
@@ -1422,6 +1518,7 @@
     function renderShopping() {
       if (!shoppingItems.length) {
         shoppingContainer.innerHTML = `<div class="empty-state">🛒 Your shopping list is empty.</div>`;
+        applySettings();
         return;
       }
       let html = '';
@@ -1645,10 +1742,8 @@
     });
 
     // ===== INIT =====
-    // Apply saved settings
     applySettings();
     
-    // Highlight active color and font in settings
     document.querySelectorAll('.color-option').forEach(el => {
       if (el.dataset.color === settings.accentColor) el.classList.add('active');
     });
