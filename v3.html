@@ -7,12 +7,12 @@
   <style>
     * {
       box-sizing: border-box;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, 'Helvetica Neue', system-ui, sans-serif;
     }
     body {
-      background: #faf7f2;
+      background: #0d0d0d;
       margin: 0;
-      padding: 16px;
+      padding: 12px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -21,51 +21,57 @@
     .app {
       max-width: 900px;
       width: 100%;
-      background: #ffffff;
-      border-radius: 32px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-      padding: 24px 20px 32px;
+      background: #1a1a1a;
+      border-radius: 28px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+      padding: 20px 16px 28px;
+      border: 1px solid #2a2a2a;
     }
     h1 {
-      font-weight: 600;
-      font-size: 1.9rem;
-      color: #3e2e1f;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: #f5a623;
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 4px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #efe6db;
-      padding-bottom: 14px;
+      margin-top: 0;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #2a2a2a;
+      letter-spacing: -0.5px;
     }
     h1 small {
-      font-size: 1rem;
+      font-size: 0.85rem;
       font-weight: 400;
-      color: #8f7a66;
+      color: #666;
       margin-left: auto;
     }
     .tabs {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .tab-btn {
-      background: #f0ebe4;
+      background: #2a2a2a;
       border: none;
       padding: 10px 18px;
       border-radius: 40px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      color: #4d3e2e;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #888;
       cursor: pointer;
       transition: 0.2s;
       flex: 1 0 auto;
+      text-align: center;
     }
     .tab-btn.active {
-      background: #3e2e1f;
-      color: white;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      background: #f5a623;
+      color: #0d0d0d;
+      box-shadow: 0 4px 16px rgba(245, 166, 35, 0.25);
+    }
+    .tab-btn:active {
+      transform: scale(0.96);
     }
     .tab-content {
       display: none;
@@ -74,24 +80,24 @@
     .tab-content.active {
       display: block;
     }
-    @keyframes fade { from { opacity: 0.5; } to { opacity: 1; } }
+    @keyframes fade { from { opacity: 0.4; } to { opacity: 1; } }
 
     .recipe-grid {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 14px;
     }
     .recipe-card {
-      background: #fcf9f6;
-      border-radius: 24px;
-      padding: 18px;
-      border: 1px solid #ede6de;
+      background: #222;
+      border-radius: 20px;
+      padding: 16px;
+      border: 1px solid #2f2f2f;
       cursor: pointer;
       transition: 0.15s;
     }
-    .recipe-card:hover {
-      border-color: #b8a392;
-      background: #f8f3ed;
+    .recipe-card:active {
+      transform: scale(0.99);
+      border-color: #f5a623;
     }
     .recipe-header {
       display: flex;
@@ -101,31 +107,32 @@
       gap: 8px;
     }
     .recipe-title {
-      font-weight: 600;
-      font-size: 1.3rem;
+      font-weight: 700;
+      font-size: 1.2rem;
       margin: 0 0 4px 0;
-      color: #2d241b;
+      color: #eee;
     }
     .recipe-img {
       width: 100%;
-      max-height: 300px;
+      max-height: 280px;
       object-fit: cover;
-      border-radius: 18px;
-      background: #e8dfd6;
+      border-radius: 14px;
+      background: #1a1a1a;
       margin: 10px 0 12px 0;
-      border: 1px solid #ddd2c6;
+      border: 1px solid #2f2f2f;
     }
     .recipe-img-placeholder {
       width: 100%;
-      height: 120px;
-      background: #e8dfd6;
-      border-radius: 18px;
+      height: 100px;
+      background: #1a1a1a;
+      border-radius: 14px;
       margin: 10px 0 12px 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #8f7a66;
-      font-size: 0.9rem;
+      color: #555;
+      font-size: 0.85rem;
+      border: 1px dashed #333;
     }
     .ingredient-list {
       list-style: none;
@@ -133,104 +140,131 @@
       margin: 8px 0 6px 0;
       display: flex;
       flex-wrap: wrap;
-      gap: 6px 12px;
+      gap: 6px 10px;
     }
     .ingredient-list li {
-      background: #ede6de;
+      background: #2a2a2a;
       padding: 4px 14px;
       border-radius: 30px;
-      font-size: 0.9rem;
-      color: #2d241b;
+      font-size: 0.85rem;
+      color: #bbb;
+      border: 1px solid #333;
     }
     .macros-display {
       display: flex;
-      gap: 16px;
+      gap: 14px;
       flex-wrap: wrap;
       margin: 8px 0 4px;
       padding: 10px 14px;
-      background: #f0ebe4;
-      border-radius: 16px;
-      font-size: 0.9rem;
+      background: #1a1a1a;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      border: 1px solid #2a2a2a;
     }
     .macros-display span {
       font-weight: 500;
+      color: #888;
     }
     .macros-display .macro-value {
-      color: #3e2e1f;
-      font-weight: 600;
+      color: #f5a623;
+      font-weight: 700;
     }
     .actions {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 14px;
+      margin-top: 12px;
       align-items: center;
-      border-top: 1px dashed #ddd2c6;
-      padding-top: 14px;
+      border-top: 1px solid #2a2a2a;
+      padding-top: 12px;
     }
     .btn {
-      background: #e8dfd6;
+      background: #2a2a2a;
       border: none;
       padding: 6px 16px;
       border-radius: 40px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #2d241b;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #ccc;
       cursor: pointer;
       transition: 0.15s;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+    }
+    .btn:active {
+      transform: scale(0.95);
     }
     .btn-primary {
-      background: #3e2e1f;
-      color: white;
+      background: #f5a623;
+      color: #0d0d0d;
     }
-    .btn-primary:hover { background: #2d241b; }
+    .btn-primary:active { background: #d98f1a; }
     .btn-outline {
       background: transparent;
-      border: 1px solid #cdbeb0;
+      border: 1px solid #333;
+      color: #aaa;
     }
-    .btn-outline:hover { background: #f0ebe4; }
-    .btn-danger { background: #e8d4cc; color: #7a3e2e; }
-    .btn-danger:hover { background: #dcc2b8; }
-    .btn-success { background: #2d7a4a; color: white; }
-    .btn-success:hover { background: #1f5f38; }
-    .btn-auto { background: #4a6fa5; color: white; }
-    .btn-auto:hover { background: #3a5a8a; }
+    .btn-outline:active { background: #2a2a2a; }
+    .btn-danger {
+      background: #3a1a1a;
+      color: #d45a5a;
+      border: 1px solid #4a2a2a;
+    }
+    .btn-danger:active { background: #4a2a2a; }
+    .btn-success {
+      background: #1a3a2a;
+      color: #6ad48a;
+      border: 1px solid #2a4a3a;
+    }
+    .btn-success:active { background: #2a4a3a; }
+    .btn-auto {
+      background: #2a3a5a;
+      color: #8ab4f5;
+      border: 1px solid #3a4a6a;
+    }
+    .btn-auto:active { background: #3a4a6a; }
 
     .empty-state {
       text-align: center;
-      color: #8f7a66;
+      color: #555;
       padding: 40px 10px;
+      font-size: 1rem;
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .form-group label {
       display: block;
-      font-weight: 500;
+      font-weight: 600;
       margin-bottom: 5px;
-      color: #3e2e1f;
+      color: #ccc;
+      font-size: 0.9rem;
     }
     .form-control {
       width: 100%;
       padding: 12px 16px;
       border-radius: 40px;
-      border: 1px solid #ddd2c6;
-      background: #fcf9f6;
+      border: 1px solid #333;
+      background: #1a1a1a;
+      color: #eee;
       font-size: 1rem;
       transition: 0.15s;
+      outline: none;
     }
     .form-control:focus {
-      outline: 2px solid #b8a392;
-      border-color: transparent;
+      border-color: #f5a623;
+      box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.15);
+    }
+    .form-control::placeholder {
+      color: #555;
     }
     textarea.form-control {
-      border-radius: 24px;
+      border-radius: 20px;
       resize: vertical;
       min-height: 70px;
+      font-family: inherit;
     }
     .ingredient-input-group {
       display: flex;
@@ -249,19 +283,23 @@
       margin: 8px 0 4px;
     }
     .chip {
-      background: #e8dfd6;
+      background: #2a2a2a;
       padding: 4px 14px;
       border-radius: 30px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      color: #ccc;
+      border: 1px solid #333;
     }
     .chip .remove {
       cursor: pointer;
-      font-weight: 600;
-      color: #7a5f48;
+      font-weight: 700;
+      color: #888;
+      font-size: 1rem;
     }
+    .chip .remove:hover { color: #d45a5a; }
 
     .macros-grid {
       display: grid;
@@ -275,16 +313,25 @@
     }
     .macro-input-group label {
       min-width: 50px;
-      font-weight: 500;
+      font-weight: 600;
       margin: 0;
+      color: #aaa;
+      font-size: 0.85rem;
     }
     .macro-input-group input {
       flex: 1;
       padding: 8px 12px;
       border-radius: 30px;
-      border: 1px solid #ddd2c6;
+      border: 1px solid #333;
+      background: #1a1a1a;
+      color: #eee;
       font-size: 0.95rem;
       width: 80px;
+      outline: none;
+    }
+    .macro-input-group input:focus {
+      border-color: #f5a623;
+      box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.15);
     }
 
     .shopping-item {
@@ -292,20 +339,26 @@
       align-items: center;
       gap: 12px;
       padding: 10px 12px;
-      border-bottom: 1px solid #ede6de;
+      border-bottom: 1px solid #2a2a2a;
     }
     .shopping-item input[type="checkbox"] {
       width: 20px;
       height: 20px;
-      accent-color: #3e2e1f;
+      accent-color: #f5a623;
+      cursor: pointer;
     }
     .shopping-item .item-name {
       flex: 1;
-      font-size: 1rem;
+      font-size: 0.95rem;
+      color: #ddd;
     }
     .shopping-item .item-source {
-      font-size: 0.8rem;
-      color: #8f7a66;
+      font-size: 0.75rem;
+      color: #555;
+    }
+    .shopping-item input:checked + .item-name {
+      text-decoration: line-through;
+      color: #555;
     }
 
     .footer-bar {
@@ -317,21 +370,31 @@
     }
     #fileInput { display: none; }
     .photo-upload-area {
-      border: 2px dashed #ddd2c6;
-      border-radius: 20px;
+      border: 2px dashed #333;
+      border-radius: 18px;
       padding: 20px;
       text-align: center;
       cursor: pointer;
       transition: 0.2s;
-      background: #fcf9f6;
+      background: #1a1a1a;
+    }
+    .photo-upload-area:active {
+      transform: scale(0.98);
     }
     .photo-upload-area:hover {
-      background: #f5efe8;
-      border-color: #b8a392;
+      border-color: #555;
+    }
+    .photo-upload-area.has-image {
+      border-color: #f5a623;
+      background: #1f1a12;
+    }
+    .photo-upload-area div {
+      color: #666;
+      font-size: 0.9rem;
     }
     .photo-preview {
       max-height: 200px;
-      border-radius: 16px;
+      border-radius: 14px;
       margin-top: 10px;
       display: none;
       width: 100%;
@@ -339,10 +402,6 @@
     }
     .photo-preview.show {
       display: block;
-    }
-    .photo-upload-area.has-image {
-      border-color: #3e2e1f;
-      background: #f5efe8;
     }
     .inline-actions {
       display: flex;
@@ -360,17 +419,56 @@
       padding: 8px 16px;
     }
     .auto-progress {
-      font-size: 0.85rem;
-      color: #4a6fa5;
+      font-size: 0.8rem;
+      color: #8ab4f5;
       margin-left: 8px;
+    }
+    .edit-hint {
+      color: #444;
+      font-size: 0.7rem;
+    }
+    .form-title {
+      color: #eee;
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+    input[type="number"]::-webkit-inner-spin-button {
+      opacity: 0.5;
+    }
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #444;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn-group .btn {
+      flex: 1;
+      justify-content: center;
+      padding: 14px;
+      font-size: 1rem;
     }
   </style>
 </head>
 <body>
 <div class="app">
   <h1>
-    🍳 My Cookbook
-    <small>PC · iOS</small>
+    🍳 Cookbook
+    <small>dark mode</small>
   </h1>
 
   <div class="tabs">
@@ -381,7 +479,7 @@
 
   <!-- RECIPES TAB -->
   <div id="tab-recipes" class="tab-content active">
-    <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
       <button class="btn btn-outline" id="exportBtn">📤 Export</button>
       <button class="btn btn-outline" id="importBtn">📥 Import</button>
       <input type="file" id="importFileInput" accept=".json" style="display:none;">
@@ -392,7 +490,7 @@
   <!-- SHOPPING TAB -->
   <div id="tab-shopping" class="tab-content">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
-      <h3 style="margin:0; color:#3e2e1f;">🛒 Shopping list</h3>
+      <h3 style="margin:0; color:#eee; font-weight:600; font-size:1.1rem;">🛒 Shopping list</h3>
       <button class="btn btn-outline" id="clearShoppingBtn">Clear checked</button>
     </div>
     <div id="shoppingListContainer"></div>
@@ -403,7 +501,7 @@
 
   <!-- ADD/EDIT RECIPE TAB -->
   <div id="tab-add" class="tab-content">
-    <h3 style="margin-top:0;" id="formTitle">📝 New Recipe</h3>
+    <h3 class="form-title" id="formTitle">📝 New Recipe</h3>
     <input type="hidden" id="editIndex" value="-1">
     
     <div class="form-group">
@@ -453,7 +551,7 @@
         <button class="btn btn-auto" id="autoMacroBtn">🤖 Auto-Calculate Macros</button>
         <span class="auto-progress" id="autoProgress"></span>
       </div>
-      <div style="font-size:0.8rem; color:#8f7a66; margin-top:4px;">Auto-calc estimates based on ingredients. Manual entry overrides auto-calc.</div>
+      <div style="font-size:0.75rem; color:#555; margin-top:4px;">Auto-calc estimates based on ingredients. Manual entry overrides auto-calc.</div>
     </div>
 
     <div class="form-group">
@@ -461,9 +559,9 @@
       <textarea class="form-control" id="instructionsInput" placeholder="Boil water, cook pasta..."></textarea>
     </div>
 
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      <button class="btn btn-primary" id="saveRecipeBtn" style="flex:2; padding:14px; font-size:1.1rem;">💾 Save Recipe</button>
-      <button class="btn btn-outline" id="cancelEditBtn" style="flex:1; padding:14px; font-size:1.1rem;">✕ Cancel</button>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="saveRecipeBtn">💾 Save Recipe</button>
+      <button class="btn btn-outline" id="cancelEditBtn">✕ Cancel</button>
     </div>
   </div>
 </div>
@@ -548,7 +646,6 @@
       'cinnamon': { cal: 247, protein: 4, carbs: 80, fat: 1.2 },
     };
 
-    // Special items with different base units
     const specialItems = {
       'egg': { perUnit: 50, cal: 77, protein: 6.5, carbs: 0.5, fat: 5.5 },
       'eggs': { perUnit: 50, cal: 77, protein: 6.5, carbs: 0.5, fat: 5.5 },
@@ -649,13 +746,12 @@
       activateTab('add');
     }
 
-    // ===== PARSE QUANTITY FROM INGREDIENT STRING =====
+    // ===== PARSE QUANTITY =====
     function parseQuantity(ingredient) {
-      // Look for patterns like "2 eggs", "200g chicken", "1 cup flour"
       const patterns = [
-        /^(\d+)\s*(g|kg|ml|l|oz|lb)?\s+(.+)/i,  // "200g chicken"
-        /^(\d+)\s+(.+)/,                         // "2 eggs"
-        /^(\d+\.\d+)\s+(.+)/,                    // "1.5 cups"
+        /^(\d+)\s*(g|kg|ml|l|oz|lb)?\s+(.+)/i,
+        /^(\d+)\s+(.+)/,
+        /^(\d+\.\d+)\s+(.+)/,
       ];
       
       for (const pattern of patterns) {
@@ -668,13 +764,12 @@
         }
       }
       
-      // If no quantity found, check if it's a count (like "2 eggs" but with no space)
       const countMatch = ingredient.match(/^(\d+)(.+)/);
       if (countMatch) {
         return { quantity: parseFloat(countMatch[1]), unit: 'count', name: countMatch[2].trim() };
       }
       
-      return { quantity: 100, unit: 'g', name: ingredient }; // default to 100g
+      return { quantity: 100, unit: 'g', name: ingredient };
     }
 
     // ===== AUTO-CALCULATE MACROS =====
@@ -698,12 +793,10 @@
           const ingLower = parsed.name.toLowerCase();
           let found = false;
           
-          // Check special items first (like eggs)
           if (specialItems[ingLower] || specialItems[ingLower.replace(/s$/, '')]) {
             const key = ingLower.replace(/s$/, '');
             const item = specialItems[key];
             const qty = parsed.quantity;
-            // For count items, each unit has the macros
             const factor = qty;
             totalCal += item.cal * factor;
             totalProtein += item.protein * factor;
@@ -712,35 +805,21 @@
             found = true;
             matchedCount++;
           } else {
-            // Search in food database
             for (const [key, value] of Object.entries(foodDB)) {
               if (ingLower.includes(key) || key.includes(ingLower)) {
-                // Determine quantity
                 let quantity = parsed.quantity;
                 let unit = parsed.unit;
                 
-                // If unit is g or empty, use as is
                 if (unit === 'kg') quantity = quantity * 1000;
                 else if (unit === 'ml' || unit === 'l') {
-                  // Assume density of 1g/ml for simplicity
                   if (unit === 'l') quantity = quantity * 1000;
-                  // For liquids, we'll use the same as grams
                 } else if (unit === 'oz') quantity = quantity * 28.35;
                 else if (unit === 'lb') quantity = quantity * 453.6;
                 else if (unit === 'count' || unit === '') {
-                  // If it's a count, try to estimate weight
-                  if (ingLower.includes('egg')) {
-                    quantity = quantity * 50; // 50g per egg
-                  } else if (ingLower.includes('tomato')) {
-                    quantity = quantity * 150; // 150g per tomato
-                  } else if (ingLower.includes('onion')) {
-                    quantity = quantity * 150; // 150g per onion
-                  } else if (ingLower.includes('garlic')) {
-                    quantity = quantity * 5; // 5g per clove
-                  } else {
-                    // Default to 100g if no unit specified
-                    quantity = 100;
-                  }
+                  if (ingLower.includes('tomato')) quantity = quantity * 150;
+                  else if (ingLower.includes('onion')) quantity = quantity * 150;
+                  else if (ingLower.includes('garlic')) quantity = quantity * 5;
+                  else quantity = 100;
                 }
                 
                 const factor = quantity / 100;
@@ -757,7 +836,6 @@
           
           if (!found) {
             unknownIngredients.push(ing);
-            // Try to guess from common patterns
             if (ingLower.includes('oil') || ingLower.includes('butter')) {
               totalCal += 800;
               totalFat += 90;
@@ -768,11 +846,7 @@
             } else if (ingLower.includes('flour') || ingLower.includes('sugar') || ingLower.includes('rice') || ingLower.includes('pasta')) {
               totalCal += 130;
               totalCarbs += 25;
-            } else if (ingLower.includes('vegetable') || ingLower.includes('fruit')) {
-              totalCal += 50;
-              totalCarbs += 10;
             } else {
-              // Generic estimate
               totalCal += 50;
               totalCarbs += 5;
               totalProtein += 1;
@@ -780,7 +854,6 @@
           }
         });
 
-        // Show results
         if (matchedCount === 0 && ingredients.length > 0) {
           autoProgress.textContent = '⚠️ No ingredients recognized. Manual entry recommended.';
           setTimeout(() => { autoProgress.textContent = ''; }, 3000);
@@ -823,7 +896,7 @@
         
         const ingredientsHtml = r.ingredients && r.ingredients.length 
           ? `<ul class="ingredient-list">${r.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>`
-          : '<div style="color:#8f7a66; font-size:0.9rem;">No ingredients</div>';
+          : '<div style="color:#444; font-size:0.85rem;">No ingredients</div>';
         
         let macrosHtml = '';
         if (r.macros && (r.macros.cal || r.macros.protein || r.macros.carbs || r.macros.fat)) {
@@ -852,10 +925,10 @@
             ${imgHtml}
             ${ingredientsHtml}
             ${macrosHtml}
-            ${r.instructions ? `<div style="margin-top:8px; color:#3e2e1f; white-space:pre-wrap; font-size:0.95rem;">${r.instructions}</div>` : ''}
+            ${r.instructions ? `<div style="margin-top:8px; color:#aaa; white-space:pre-wrap; font-size:0.9rem;">${r.instructions}</div>` : ''}
             <div class="actions">
-              <span style="font-size:0.8rem; color:#8f7a66;">${r.ingredients ? r.ingredients.length : 0} ingredients</span>
-              <span class="edit-hint" style="font-size:0.75rem; color:#8f7a66;">👆 Tap card to edit</span>
+              <span style="font-size:0.75rem; color:#444;">${r.ingredients ? r.ingredients.length : 0} ingredients</span>
+              <span class="edit-hint">👆 Tap card to edit</span>
             </div>
           </div>
         `;
@@ -921,7 +994,7 @@
             <input type="checkbox" ${checked} class="shopping-checkbox">
             <span class="item-name">${item.name}</span>
             <span class="item-source">${item.source ? '📖 ' + item.source : ''}</span>
-            <button class="btn btn-danger" style="padding:2px 12px; font-size:0.8rem;" data-shopping-index="${idx}">✕</button>
+            <button class="btn btn-danger" style="padding:2px 12px; font-size:0.75rem;" data-shopping-index="${idx}">✕</button>
           </div>
         `;
       });
