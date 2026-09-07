@@ -311,19 +311,18 @@
   // 🔥 YOUR FIREBASE CONFIG - REPLACE WITH YOUR OWN!
   // ============================================================
   const firebaseConfig = {
-    apiKey: "AIzaSyBIA_W5BvDPC9Z98WZVOPOt_BRFtEzKPak",
-    authDomain: "cookbookv2-be007.firebaseapp.com",
-    projectId: "cookbookv2-be007",
-    storageBucket: "cookbookv2-be007.firebasestorage.app",
-    messagingSenderId: "490622541826",
-    appId: "1:490622541826:web:92de6f5ac67585dacf471b",
-    
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
   // ============================================================
 
   // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
   // ===== STATE =====
   let recipes = [];
@@ -405,13 +404,11 @@
     'almonds': { cal: 579, protein: 21, carbs: 22, fat: 50 },
     'walnuts': { cal: 654, protein: 15, carbs: 14, fat: 65 },
     'peanut butter': { cal: 588, protein: 25, carbs: 20, fat: 50 },
-    'oatmeal': { cal: 71, protein: 2.5, carbs: 12, fat: 1.4 },
-    'coconut milk': { cal: 230, protein: 2.3, carbs: 5.5, fat: 24 },
-    'soy sauce': { cal: 53, protein: 8.5, carbs: 4.9, fat: 0.6 },
+    'oatmeal': { cal: 71, protein: 2.5, carbs: 12, fat: 1.4 }
   };
   const specialItems = {
     'egg': { perUnit: 50, cal: 77, protein: 6.5, carbs: 0.5, fat: 5.5 },
-    'eggs': { perUnit: 50, cal: 77, protein: 6.5, carbs: 0.5, fat: 5.5 },
+    'eggs': { perUnit: 50, cal: 77, protein: 6.5, carbs: 0.5, fat: 5.5 }
   };
 
   // ============================================================
@@ -509,7 +506,6 @@
     });
     recipeListEl.innerHTML = html;
 
-    // Event listeners
     document.querySelectorAll('.recipe-card').forEach(card => {
       card.addEventListener('click', (e) => {
         if (e.target.closest('button')) return;
@@ -681,7 +677,6 @@
         const name = parsed.name.toLowerCase();
         let found = false;
 
-        // Check special items
         if (specialItems[name] || specialItems[name.replace(/s$/, '')]) {
           const key = name.replace(/s$/, '');
           const item = specialItems[key];
@@ -763,7 +758,7 @@
         carbs: parseFloat(macroCarbs.value) || 0,
         fat: parseFloat(macroFat.value) || 0
       },
-      createdBy: 'cookbook_user',
+      createdBy: '👤 Cook',
       updatedAt: new Date().toISOString()
     };
 
@@ -944,7 +939,6 @@
     document.querySelector('.header h1').style.color = isDark ? '#eee' : '#222';
   }
 
-  // Settings UI
   document.querySelectorAll('.color-option').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.color-option').forEach(b => b.classList.remove('active'));
@@ -985,14 +979,12 @@
     settings.theme = 'dark';
     localStorage.setItem('cookbook_settings', JSON.stringify(settings));
     applySettings();
-    document.querySelector('h1 small').textContent = 'shared';
   });
 
   document.getElementById('themeLight').addEventListener('click', () => {
     settings.theme = 'light';
     localStorage.setItem('cookbook_settings', JSON.stringify(settings));
     applySettings();
-    document.querySelector('h1 small').textContent = 'shared';
   });
 
   const radiusSlider = document.getElementById('radiusSlider');
@@ -1061,7 +1053,6 @@
   applySettings();
   renderIngredientChips();
   
-  // Highlight active color and font
   document.querySelectorAll('.color-option').forEach(el => {
     if (el.dataset.color === settings.accentColor) el.classList.add('active');
   });
@@ -1070,7 +1061,6 @@
   });
 
   console.log('⚔️ Mace & Meals - Firebase version loaded!');
-  console.log('📱 Share this URL with your boyfriend to sync recipes!');
 </script>
 </body>
 </html>
